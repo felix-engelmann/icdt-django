@@ -1,0 +1,9 @@
+[project]
+name = "icdt_django"
+version = "0.1.0"
+description = "A simple Django demo"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Django>=5.1,<6.0",
+]
