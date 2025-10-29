@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.core.management.base import BaseCommand
 from apps.faculty.models import Department, Person
+from apps.grants.models import Grant, Sponsor
 
 
 class Command(BaseCommand):
@@ -15,12 +16,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(options["file"]) as f:
             fcsv = csv.DictReader(f)
-            opts = defaultdict(set)
             for row in fcsv:
                 print(row)
-                for k,v in row.items():
-                    opts[k].add(v)
+                t = row["BEST_PROPOSAL_ID"][:3]
+                tid = row["BEST_PROPOSAL_ID"][3:].replace("-","")
 
-            for k,v in opts.items():
-                if len(v) < 10:
-                    print(k,v)
+                revst = {k: v for v, k in Grant.STATUS.items()}
+                status = revst[row["PROPOSAL_STATUS"]]
+
+                fed = not ("Non-" in row['FED_STATUS'])
+
+                spon = Sponsor.objects.get_or_create(name=row['SPONSOR_NAME'], spn_id=row['SPONSOR_ID'])[0]
+
+                Grant.objects.get_or_create(type=t,tid=tid, status=status, federal=fed, sponsor=spon,
+                                            report_date=row['REPORT_DATE'], total= row['PROPOSAL_SPONSOR_TOTAL'])

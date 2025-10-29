@@ -16,10 +16,13 @@ class Investigator(models.Model):
     }
     type = models.CharField(max_length=10, choices=TYPE)
 
-
 class Sponsor(models.Model):
     name = models.CharField(max_length=200)
     spn_id = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
 
 class Grant(models.Model):
     AWP = "AWP"
