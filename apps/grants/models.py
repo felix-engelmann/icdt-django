@@ -43,7 +43,7 @@ class Grant(models.Model):
               PENDING: 'Submitted to Sponsor/Pending',
               NO_DATA: 'No Award Data'}
 
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=STATUS)
 
     title= models.CharField(max_length=200)
 

@@ -10,7 +10,11 @@ class SponsorAdmin(admin.ModelAdmin):
 admin.site.register(Sponsor, SponsorAdmin)
 
 class GrantAdmin(admin.ModelAdmin):
-    list_display = ("type","tid",'status',"title","federal","report_date","sponsor","total")
-    list_filter = ("type",'status',"federal","report_date","sponsor")
+    list_display = ("type","tid",'status',"get_investigators","title","federal","report_date","sponsor","total")
+    list_filter = ("type",'status',"investigators","federal","report_date","sponsor")
+
+    def get_investigators(self, obj):
+        return ",".join([str(p) for p in obj.investigators.all()])
+
 
 admin.site.register(Grant, GrantAdmin)

@@ -10,7 +10,9 @@ class Department(models.Model):
 
 class Person(models.Model):
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    employee_id = models.CharField(max_length=20, null=True, unique=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.last_name}, {self.first_name}"

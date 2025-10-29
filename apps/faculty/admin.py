@@ -4,7 +4,7 @@ from .models import Person, Department
 # Register your models here.
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name',"department")
+    list_display = ('first_name',"last_name", "employee_id","department")
     list_filter = ("department",)
 
 admin.site.register(Person, PersonAdmin)
