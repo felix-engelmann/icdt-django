@@ -18,7 +18,7 @@ class Command(BaseCommand):
             fcsv = csv.DictReader(f)
             for row in fcsv:
                 print(row)
-                course = Course.objects.get(code=row["COURSE_CODE"])
+                course = Course.objects.get(program=row["COURSE_CODE"].split(" ")[0], level=int(row["COURSE_CODE"].split(" ")[1]))
                 print(course)
 
                 parts = row["OFFERED_PERIOD"].split(" ")
