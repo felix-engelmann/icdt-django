@@ -17,7 +17,7 @@ class Course(models.Model):
     graduate = models.BooleanField()
 
     def __str__(self):
-        return f"{self.code}: {self.title}"
+        return f"{self.code}"
 
 class Semester(models.Model):
     SPRING = "0SP"
@@ -44,5 +44,5 @@ class CoursOffering(models.Model):
     lecturers = models.ManyToManyField(Person)
 
     def __str__(self):
-        return f"{self.period} {self.course.code} ({", ".join(self.lecturers.values_list('name', flat=True))})"
+        return f"{self.period} {self.course.code}"
 

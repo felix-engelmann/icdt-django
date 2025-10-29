@@ -2,5 +2,10 @@ from django.contrib import admin
 from .models import Person, Department
 
 # Register your models here.
-admin.site.register(Person)
+
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('name',"department")
+    list_filter = ("department",)
+
+admin.site.register(Person, PersonAdmin)
 admin.site.register(Department)
