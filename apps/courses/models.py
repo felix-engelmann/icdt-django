@@ -10,14 +10,19 @@ class CourseType(models.Model):
         return self.name
 
 class Course(models.Model):
-    code = models.CharField(max_length=40)
+    program = models.CharField(max_length=40)
+    level = models.IntegerField()
     type = models.ManyToManyField(CourseType)
     title = models.CharField(max_length=250)
     undergrad = models.BooleanField()
     graduate = models.BooleanField()
 
     def __str__(self):
-        return f"{self.code}"
+        return f"{self.program} {self.level}"
+
+    class Meta:
+        unique_together = ["program", "level"]
+        ordering = ["program", "level"]
 
 class Semester(models.Model):
     SPRING = "0SP"
@@ -34,6 +39,10 @@ class Semester(models.Model):
     def __str__(self):
         return f"{self.term[1:]}{self.year%100}"
 
+    class Meta:
+        ordering = ['year',"term"]
+
+
 class CourseOffering(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     period = models.ForeignKey(Semester, on_delete=models.CASCADE)
@@ -43,6 +52,9 @@ class CourseOffering(models.Model):
 
     lecturers = models.ManyToManyField(Person)
 
+    class Meta:
+        ordering = ['course',"period"]
+
     def __str__(self):
-        return f"{self.period} {self.course.code}"
+        return f"{self.period} {self.course.program} {self.course.level}"
 

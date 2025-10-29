@@ -23,6 +23,8 @@ class Command(BaseCommand):
                     tobj = CourseType.objects.get_or_create(name=typ)[0]
                     type_objects.append(tobj)
                 print(type_objects)
-                course = Course.objects.get_or_create(code=row['COURSE_CODE'].upper(), title=row["TITLE"],
+                program = row['COURSE_CODE'].split(" ")[0].upper()
+                level = int(row['COURSE_CODE'].split(" ")[1])
+                course = Course.objects.get_or_create(program=program, level=level, title=row["TITLE"],
                                              undergrad="UG" in row["GRAD_LEVEL"], graduate="Grad" in row["GRAD_LEVEL"])[0]
                 course.type.set(type_objects)
