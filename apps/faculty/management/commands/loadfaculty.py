@@ -16,5 +16,6 @@ class Command(BaseCommand):
             fcsv = csv.DictReader(f)
             for row in fcsv:
                 print(row)
+                # TODO: fix the order of last/first name
                 dep = Department.objects.get_or_create(name=row["DEPARTMENT"])[0]
                 Person.objects.get_or_create(name=row["NAME"], department=dep)

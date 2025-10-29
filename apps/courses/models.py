@@ -34,7 +34,7 @@ class Semester(models.Model):
     def __str__(self):
         return f"{self.term[1:]}{self.year%100}"
 
-class CoursOffering(models.Model):
+class CourseOffering(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     period = models.ForeignKey(Semester, on_delete=models.CASCADE)
 

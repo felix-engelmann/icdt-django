@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Semester, Course, CoursOffering, CourseType
+from .models import Semester, Course, CourseOffering, CourseType
 # Register your models here.
 
 admin.site.register(CourseType)
@@ -22,4 +22,4 @@ class CourseOfferingAdmin(admin.ModelAdmin):
     def get_lecturers(self, obj):
         return ",".join([str(p) for p in obj.lecturers.all()])
 
-admin.site.register(CoursOffering, CourseOfferingAdmin)
+admin.site.register(CourseOffering, CourseOfferingAdmin)
