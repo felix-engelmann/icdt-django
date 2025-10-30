@@ -1,0 +1,173 @@
+# deployment.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: kubernetes.io/basic-auth
+stringData:
+  password: <STRONG POSTGRES SECRET>
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - image: postgres:18
+        name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: icdt
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-persistent-storage
+          mountPath: /var/lib/postgresql
+      volumes:
+      - name: postgres-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: postgres
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: django-secret
+type: kubernetes.io/Opaque
+stringData:
+  secret_key: <STRONG DJANGO SECRET>
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  labels:
+    app: django-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+      - name: django
+        image: ghcr.io/felix-engelmann/icdt-django:main
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args: ["-c", "uv run manage.py collectstatic --noinput && uv run manage.py migrate && uv run uvicorn icdt_data.asgi:application --host 0.0.0.0"]
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        env:
+        - name: DJANGO_ALLOWED_HOSTS
+          value: "icdt.dranspo.se"
+        - name: DJANGO_TRUSTED_ORIGINS
+          value: "https://icdt.dranspo.se"
+        - name: DB_NAME
+          value: icdt
+        - name: DB_SERVICE
+          value: postgres
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DJANGO_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: secret_key
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-app-service
+spec:
+  selector:
+    app: django-app
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP  # or LoadBalancer if you want external access
+
+
+---
+# ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: default
+spec:
+  ingressClassName: "traefik"
+  rules:
+  - host: icdt.dranspo.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: django-app-service
+            port:
+              number: 8000
+
