@@ -1,13 +1,16 @@
 from django.db import models
 
 from apps.faculty.models import Person
+
 # Create your models here.
+
 
 class CourseType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class Course(models.Model):
     program = models.CharField(max_length=40)
@@ -24,6 +27,7 @@ class Course(models.Model):
         unique_together = ["program", "level"]
         ordering = ["program", "level"]
 
+
 class Semester(models.Model):
     SPRING = "0SP"
     SUMMER = "1SU"
@@ -37,10 +41,10 @@ class Semester(models.Model):
     term = models.CharField(max_length=5, choices=SEMESTERS)
 
     def __str__(self):
-        return f"{self.term[1:]}{self.year%100}"
+        return f"{self.term[1:]}{self.year % 100}"
 
     class Meta:
-        ordering = ['year',"term"]
+        ordering = ["year", "term"]
 
 
 class CourseOffering(models.Model):
@@ -53,8 +57,7 @@ class CourseOffering(models.Model):
     lecturers = models.ManyToManyField(Person)
 
     class Meta:
-        ordering = ['course',"period"]
+        ordering = ["course", "period"]
 
     def __str__(self):
         return f"{self.period} {self.course.program} {self.course.level}"
-

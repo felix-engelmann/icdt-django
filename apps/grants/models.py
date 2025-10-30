@@ -5,6 +5,7 @@ from apps.faculty.models import Person
 
 # Create your models here.
 
+
 class Investigator(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     grant = models.ForeignKey("Grant", on_delete=models.CASCADE)
@@ -15,6 +16,7 @@ class Investigator(models.Model):
         CO_PI: "CO PI",
     }
     type = models.CharField(max_length=10, choices=TYPE)
+
 
 class Sponsor(models.Model):
     name = models.CharField(max_length=200)
@@ -32,20 +34,22 @@ class Grant(models.Model):
         GRT: "GRT",
     }
     type = models.CharField(max_length=10, choices=TYPE)
-    tid=models.CharField(max_length=50)
+    tid = models.CharField(max_length=50)
 
     NOT_FUNDED = "not_funded"
     AWARD_RECEIVED = "received"
     PENDING = "pending"
     NO_DATA = "no_data"
-    STATUS = {NOT_FUNDED: 'Not Funded',
-              AWARD_RECEIVED: 'Award Received',
-              PENDING: 'Submitted to Sponsor/Pending',
-              NO_DATA: 'No Award Data'}
+    STATUS = {
+        NOT_FUNDED: "Not Funded",
+        AWARD_RECEIVED: "Award Received",
+        PENDING: "Submitted to Sponsor/Pending",
+        NO_DATA: "No Award Data",
+    }
 
     status = models.CharField(max_length=20, choices=STATUS)
 
-    title= models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
 
     investigators = models.ManyToManyField(through=Investigator, to=Person)
 
@@ -56,6 +60,3 @@ class Grant(models.Model):
     sponsor = models.ForeignKey(Sponsor, on_delete=models.SET_NULL, null=True)
 
     total = models.DecimalField(decimal_places=2, max_digits=10)
-
-
-

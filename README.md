@@ -23,7 +23,7 @@ With a database, create the admin account, answering the questions posed by:
 
     python manage.py createsuperuser
 
-Finally run the project with 
+Finally run the project with
 
     python manage.py runserver
 
