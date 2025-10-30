@@ -79,11 +79,11 @@ if "DB_NAME" in os.environ:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "NAME": os.environ["DB_NAME"],
-            "USER": os.environ["DB_USER"],
+            "NAME": os.getenv("DB_NAME","icdt_data"),
+            "USER": os.getenv("DB_USER","postgres"),
             "PASSWORD": os.environ["DB_PASS"],
-            "HOST": os.environ["DB_SERVICE"],
-            "PORT": os.environ["DB_PORT"],
+            "HOST": os.getenv("DB_SERVICE","localhost"),
+            "PORT": os.getenv("DB_PORT",5432),
         }
     }
 else:
