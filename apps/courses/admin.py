@@ -36,8 +36,20 @@ admin.site.register(Course, CourseAdmin)
 
 
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display = ("course", "period", "get_lecturers")
-    list_filter = ("course", "period", "lecturers")
+    list_display = (
+        "course",
+        "level_sub",
+        "level_suffix",
+        "period",
+        "enrolled",
+        "limit",
+        "get_lecturers",
+    )
+    list_filter = (
+        "course__program",
+        "period",
+    )
+    search_fields = ("lecturers__other_names",)
 
     def get_lecturers(self, obj):
         return ",".join([str(p) for p in obj.lecturers.all()])

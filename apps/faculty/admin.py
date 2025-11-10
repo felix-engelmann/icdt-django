@@ -5,7 +5,13 @@ from .models import Person, Department
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ("first_name", "last_name", "employee_id", "department")
+    list_display = (
+        "first_name",
+        "last_name",
+        "other_names",
+        "employee_id",
+        "department",
+    )
     list_filter = ("department",)
 
 

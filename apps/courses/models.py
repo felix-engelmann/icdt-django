@@ -16,9 +16,9 @@ class Course(models.Model):
     program = models.CharField(max_length=40)
     level = models.IntegerField()
     type = models.ManyToManyField(CourseType)
-    title = models.CharField(max_length=250)
-    undergrad = models.BooleanField()
-    graduate = models.BooleanField()
+    title = models.CharField(max_length=250, null=True)
+    undergrad = models.BooleanField(null=True)
+    graduate = models.BooleanField(null=True)
 
     def __str__(self):
         return f"{self.program} {self.level}"
@@ -29,10 +29,12 @@ class Course(models.Model):
 
 
 class Semester(models.Model):
-    SPRING = "0SP"
-    SUMMER = "1SU"
-    AUTUMN = "2AU"
+    WINTER = "0WI"
+    SPRING = "2SP"
+    SUMMER = "4SU"
+    AUTUMN = "8AU"
     SEMESTERS = {
+        WINTER: "Winter",
         SPRING: "Spring",
         SUMMER: "Summer",
         AUTUMN: "Autumn",
@@ -47,14 +49,23 @@ class Semester(models.Model):
         ordering = ["year", "term"]
 
 
+class Instructor(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    offering = models.ForeignKey("CourseOffering", on_delete=models.CASCADE)
+    type = models.CharField(max_length=10, null=True)
+
+
 class CourseOffering(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     period = models.ForeignKey(Semester, on_delete=models.CASCADE)
 
+    level_sub = models.IntegerField(null=True)
+    level_suffix = models.CharField(max_length=5, null=True)
+
     limit = models.IntegerField()
     enrolled = models.IntegerField()
 
-    lecturers = models.ManyToManyField(Person)
+    lecturers = models.ManyToManyField(to=Person, through=Instructor)
 
     class Meta:
         ordering = ["course", "period"]

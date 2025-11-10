@@ -9,5 +9,6 @@ dependencies = [
     "tqdm",
     "psycopg2-binary",
     "uvicorn",
-    "whitenoise"
+    "whitenoise",
+    "pydantic",
 ]
