@@ -252,7 +252,7 @@ class Command(BaseCommand):
         for eid, n in name_id_map.items():
             print(eid, Counter(n))
             pass
-        for eid, name_list in []:  # name_id_map.items():
+        for eid, name_list in name_id_map.items():
             names = set(name_list)
             p = Person.objects.get_or_create(employee_id=eid)[0]
             if p.other_names:
