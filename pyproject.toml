@@ -11,4 +11,6 @@ dependencies = [
     "uvicorn",
     "whitenoise",
     "pydantic",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
 ]

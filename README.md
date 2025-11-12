@@ -28,3 +28,23 @@ Finally run the project with
     python manage.py runserver
 
 Access it at http://127.0.0.1:8000/admin/ and log in with the credentials created above.
+
+
+## DB Permissions
+
+    CREATE ROLE superset WITH LOGIN PASSWORD '123123';
+
+    GRANT CONNECT ON DATABASE icdt TO superset;
+
+    GRANT USAGE ON SCHEMA public TO superset;
+
+    GRANT SELECT ON public.courses_course_type              TO superset;  
+    GRANT SELECT ON public.courses_courseoffering           TO superset;
+    GRANT SELECT ON public.courses_courseoffering_lecturers TO superset;
+    GRANT SELECT ON public.courses_coursetype               TO superset;
+    GRANT SELECT ON public.courses_semester                 TO superset;
+    GRANT SELECT ON public.faculty_department               TO superset;
+    GRANT SELECT ON public.faculty_person                   TO superset;
+    GRANT SELECT ON public.grants_grant                     TO superset;
+    GRANT SELECT ON public.grants_investigator              TO superset;
+    GRANT SELECT ON public.grants_sponsor                   TO superset;
