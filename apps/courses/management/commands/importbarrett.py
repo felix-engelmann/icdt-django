@@ -2,9 +2,11 @@ import os.path
 import pathlib
 from collections import defaultdict
 from glob import glob
-from typing import Literal, Counter
+from typing import Literal
 
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
+
 from apps.courses.models import Course, Semester, CourseOffering, Instructor
 from pydantic import BaseModel, field_validator
 
@@ -183,11 +185,11 @@ class Command(BaseCommand):
         if "schedule" in str(options["path"]):
             print("use the employee_id files")
             return
-        for file in glob(str(options["path"]) + "/**/*.txt", recursive=True):
-            print(file)
+        for file in tqdm(glob(str(options["path"]) + "/**/*.txt", recursive=True)):
+            # print(file)
 
             splitted = file.split("/")
-            print(splitted)
+            # print(splitted)
             pos = splitted.index("barrett.3")
             if pos >= 0:
                 splitted[pos + 1] = "schedule"
@@ -250,11 +252,12 @@ class Command(BaseCommand):
 
         # print(name_id_map)
         for eid, n in name_id_map.items():
-            print(eid, Counter(n))
+            # print(eid, Counter(n))
             pass
-        for eid, name_list in name_id_map.items():
+        print("create persons")
+        for eid, name_list in tqdm(name_id_map.items()):
             names = set(name_list)
-            p = Person.objects.get_or_create(employee_id=eid)[0]
+            p = Person.objects.get_or_create(employee_id=int(eid))[0]
             if p.other_names:
                 old = set(p.other_names)
             else:
@@ -273,9 +276,9 @@ class Command(BaseCommand):
                 p.save()
             # break
         # return
-
-        for file in glob(str(options["path"]) + "/**/*.txt", recursive=True):
-            print(file)
+        print("create offerings")
+        for file in tqdm(glob(str(options["path"]) + "/**/*.txt", recursive=True)):
+            # print(file)
             nums = parse_file(file, Teaching)
 
             semester_number = int(file.split("/")[-1][:4])
@@ -288,7 +291,7 @@ class Command(BaseCommand):
                 4: Semester.SUMMER,
                 8: Semester.AUTUMN,
             }
-            print(year, term_map[term])
+            # print(year, term_map[term])
 
             semester = Semester.objects.get_or_create(
                 year=2000 + year, term=term_map[term]
@@ -308,7 +311,7 @@ class Command(BaseCommand):
                     enrolled=t.enrolled,
                 )[0]
                 for lec in t.empl_id:
-                    p = Person.objects.get_or_create(employee_id=lec[0])[0]
+                    p = Person.objects.get_or_create(employee_id=int(lec[0]))[0]
                     Instructor.objects.get_or_create(person=p, offering=co, type=lec[1])
                 # break
             # break

@@ -14,7 +14,7 @@ class Person(models.Model):
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
     first_name = models.CharField(max_length=200, null=True)
     last_name = models.CharField(max_length=200, null=True)
-    employee_id = models.CharField(max_length=20, null=True, unique=True)
+    employee_id = models.IntegerField(null=True, unique=True)
 
     other_names = models.JSONField(null=True)
 

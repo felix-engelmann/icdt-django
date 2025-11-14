@@ -142,7 +142,9 @@ class Command(BaseCommand):
                     awd = Award.objects.get_or_create(**clean)[0]
 
                     if row["PI Empl ID"] == row["PI Empl ID"]:
-                        pi = Person.objects.get_or_create(employee_id=int())[0]
+                        pi = Person.objects.get_or_create(
+                            employee_id=int(row["PI Empl ID"])
+                        )[0]
                         Collaborator.objects.get_or_create(
                             award=awd, person=pi, type=Investigator.PI
                         )
@@ -155,6 +157,7 @@ class Command(BaseCommand):
                                 award=awd, person=copi, type=Investigator.CO_PI
                             )
 
+                    # this was only to test how much the award data matches with the proposal data
                     if proposal.count() == 100:
                         # print(proposal)
                         # print(row)

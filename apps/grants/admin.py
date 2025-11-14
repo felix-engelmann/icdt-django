@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.urls import reverse
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html
 
 from apps.grants.models import Sponsor, Proposal, Investigator, Collaborator, Award
 
+from apps.grants.utils import link_listing
 
 # Register your models here.
 
@@ -14,30 +15,17 @@ class SponsorAdmin(admin.ModelAdmin):
     readonly_fields = ("proposals", "prime_proposals", "awards", "prime_awards")
     search_fields = ("name", "spn_id")
 
-    def listing(self, revname, objs):
-        links = [
-            format_html(
-                '<a href="{}">{}</a>',
-                reverse(revname, args=[p.id]),
-                p.title,
-            )
-            for p in objs
-        ]
-        return (
-            format_html_join("", "<li>{}</li>", ((link,) for link in links)) or "(None)"
-        )
-
     def proposals(self, obj):
-        return self.listing("admin:grants_proposal_change", obj.proposal_set.all())
+        return link_listing(obj.proposal_set.all(), "admin:grants_proposal_change")
 
     def prime_proposals(self, obj):
-        return self.listing("admin:grants_proposal_change", obj.prime_proposals.all())
+        return link_listing(obj.prime_proposals.all(), "admin:grants_proposal_change")
 
     def awards(self, obj):
-        return self.listing("admin:grants_award_change", obj.award_set.all())
+        return link_listing(obj.award_set.all(), "admin:grants_award_change")
 
     def prime_awards(self, obj):
-        return self.listing("admin:grants_award_change", obj.prime_awards.all())
+        return link_listing(obj.prime_awards.all(), "admin:grants_award_change")
 
 
 admin.site.register(Sponsor, SponsorAdmin)
