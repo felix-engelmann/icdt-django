@@ -78,10 +78,13 @@ class Proposal(models.Model):
     def __str__(self):
         return f"Proposal {self.wd_id or self.ps_id}"
 
+    class Meta:
+        unique_together = ["wd_id", "ps_id"]
+
 
 class Award(models.Model):
-    wd_id = models.CharField(max_length=50, null=True)
-    ps_id = models.CharField(max_length=50, null=True)
+    wd_id = models.CharField(max_length=50, null=True, unique=True)
+    ps_id = models.CharField(max_length=50, null=True, unique=True)
 
     proposal = models.ForeignKey(Proposal, null=True, on_delete=models.SET_NULL)
 
@@ -103,3 +106,6 @@ class Award(models.Model):
 
     def __str__(self):
         return f"Award {self.wd_id or self.ps_id}"
+
+    class Meta:
+        unique_together = ["wd_id", "ps_id"]

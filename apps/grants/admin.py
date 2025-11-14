@@ -4,7 +4,8 @@ from django.utils.html import format_html
 
 from apps.grants.models import Sponsor, Proposal, Investigator, Collaborator, Award
 
-from apps.grants.utils import link_listing
+from apps.grants.utils import link_listing, rel_investigators
+
 
 # Register your models here.
 
@@ -57,13 +58,14 @@ class ProposalAdmin(admin.ModelAdmin):
         "report_date",
         "sponsor",
     )
+    search_fields = ("wd_id", "ps_id", "title")
 
     inlines = [
         InvestigatorInline,
     ]
 
     def get_investigators(self, obj):
-        return ",".join([str(p) for p in obj.investigators.all()])
+        return rel_investigators(obj.investigator_set.all())
 
 
 admin.site.register(Proposal, ProposalAdmin)
@@ -75,8 +77,8 @@ class AwardAdmin(admin.ModelAdmin):
         "proposal_link",
         "get_investigators",
         "title",
-        "sponsor",
-        "prime_sponsor",
+        "sponsor_link",
+        "prime_sponsor_link",
         "start_date",
         "end_date",
         "beginning_fiscal_year",
@@ -90,7 +92,11 @@ class AwardAdmin(admin.ModelAdmin):
         "investigators",
         "sponsor",
     )
-
+    search_fields = (
+        "wd_id",
+        "ps_id",
+        "title",
+    )
     inlines = [
         CollaboratorInline,
     ]
@@ -103,8 +109,20 @@ class AwardAdmin(admin.ModelAdmin):
 
     proposal_link.short_description = "Proposal"
 
+    def sponsor_link(self, obj):
+        # reverse URL to change page for the author
+        if obj.sponsor:
+            url = reverse("admin:grants_sponsor_change", args=[obj.sponsor.id])
+            return format_html('<a href="{}">{}</a>', url, obj.sponsor)
+
+    def prime_sponsor_link(self, obj):
+        # reverse URL to change page for the author
+        if obj.prime_sponsor:
+            url = reverse("admin:grants_sponsor_change", args=[obj.prime_sponsor.id])
+            return format_html('<a href="{}">{}</a>', url, obj.prime_sponsor)
+
     def get_investigators(self, obj):
-        return ",".join([str(p) for p in obj.investigators.all()])
+        return rel_investigators(obj.collaborator_set.all())
 
 
 admin.site.register(Award, AwardAdmin)

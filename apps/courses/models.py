@@ -54,6 +54,9 @@ class Instructor(models.Model):
     offering = models.ForeignKey("CourseOffering", on_delete=models.CASCADE)
     type = models.CharField(max_length=10, null=True)
 
+    def __str__(self):
+        return str(self.person)
+
 
 class CourseOffering(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)

@@ -21,7 +21,7 @@ class PersonAdmin(admin.ModelAdmin):
         "other_names",
         "employee_id",
     )
-    readonly_fields = ("proposals", "classes")  # "awards")
+    readonly_fields = ("proposals", "awards", "classes")
 
     def proposals(self, obj):
         return link_listing(
@@ -29,11 +29,17 @@ class PersonAdmin(admin.ModelAdmin):
             "admin:grants_proposal_change",
         )
 
+    def awards(self, obj):
+        return link_listing(
+            obj.award_set.all(),
+            "admin:grants_award_change",
+        )
+
     def classes(self, obj):
         return link_listing(
             obj.courseoffering_set.all(),
             "admin:courses_courseoffering_change",
-            "course",
+            ("course", "period"),
         )
 
 
