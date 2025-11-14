@@ -1,10 +1,11 @@
 import pathlib
+from collections import Counter
 from datetime import datetime
 
 from tqdm import tqdm
 
 from django.core.management.base import BaseCommand
-from apps.faculty.models import Person
+from apps.faculty.models import Person, Department
 from apps.grants.models import Proposal, Sponsor, Investigator, Award, Collaborator
 
 import pandas as pd
@@ -36,6 +37,38 @@ class Command(BaseCommand):
             sponsor.save()
             return sponsor
 
+        def set_name(eid, last_comma_first):
+            if Counter(last_comma_first).get(",") != 1:
+                return
+            p = Person.objects.get(employee_id=eid)
+            parts = last_comma_first.split(",")
+            p.first_name = parts[1].strip()
+            p.last_name = parts[0].strip()
+
+            if p.other_names:
+                old = set(p.other_names)
+            else:
+                old = set()
+            old.update({last_comma_first.strip()})
+            p.other_names = list(old)
+            p.save()
+
+        def set_department(eid, college, department):
+            dep = Department.objects.get_or_create(
+                college=college.strip(), name=department.strip()
+            )[0]
+            p = Person.objects.get(employee_id=eid)
+            p.department = dep
+            p.save()
+
+        def set_names(ids, names):
+            empl_ids = ids.split(",")
+            name_split = names.split("|")
+            if len(empl_ids) != len(name_split) - 1:
+                return
+            for i, n in zip(empl_ids, name_split):
+                set_name(i, n)
+
         excel = pd.ExcelFile(options["file"])
 
         for sheet_name in excel.sheet_names:
@@ -62,7 +95,10 @@ class Command(BaseCommand):
                     }
 
                     pi = Person.objects.get_or_create(employee_id=row["PI Empl ID"])[0]
-
+                    set_name(row["PI Empl ID"], row["PI Name (Last, First)"])
+                    set_department(
+                        row["PI Empl ID"], row["PI College"], row["PI Department"]
+                    )
                     clean["sponsor"] = insert_sponsor(row)
 
                     prime_id = row["Prime Sponsor ID"]
@@ -89,6 +125,7 @@ class Command(BaseCommand):
                             Investigator.objects.get_or_create(
                                 proposal=prop, person=copi, type=Investigator.CO_PI
                             )
+                        set_names(row["Co PI Empl ID"], row["Co PI Name"])
 
                     # break
                 # df.columns
@@ -148,6 +185,14 @@ class Command(BaseCommand):
                         Collaborator.objects.get_or_create(
                             award=awd, person=pi, type=Investigator.PI
                         )
+                        set_name(
+                            row["PI Empl ID"], row["PI Preferred Name (Last, First)"]
+                        )
+                        set_department(
+                            row["PI Empl ID"],
+                            row["PI Home College"],
+                            row["PI Home Department"],
+                        )
                     if row["Co PI EmpID(s)"] == row["Co PI EmpID(s)"]:
                         for coid in row["Co PI EmpID(s)"].split(","):
                             copi = Person.objects.get_or_create(
@@ -156,6 +201,7 @@ class Command(BaseCommand):
                             Collaborator.objects.get_or_create(
                                 award=awd, person=copi, type=Investigator.CO_PI
                             )
+                        set_names(row["Co PI EmpID(s)"], row["Co-PI Name(s)"])
 
                     # this was only to test how much the award data matches with the proposal data
                     if proposal.count() == 100:

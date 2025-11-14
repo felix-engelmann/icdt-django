@@ -44,4 +44,14 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Person, PersonAdmin)
-admin.site.register(Department)
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "college",
+        "name",
+    )
+    list_filter = ("college",)
+
+
+admin.site.register(Department, DepartmentAdmin)
