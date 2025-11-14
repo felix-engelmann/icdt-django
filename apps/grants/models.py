@@ -17,6 +17,18 @@ class Investigator(models.Model):
     }
     type = models.CharField(max_length=10, choices=TYPE)
 
+    def __str__(self):
+        return f"{self.person.first_name} {self.person.last_name} ({self.type})"
+
+
+class Collaborator(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    award = models.ForeignKey("Award", on_delete=models.CASCADE)
+    type = models.CharField(max_length=10, choices=Investigator.TYPE)
+
+    def __str__(self):
+        return f"{self.person.first_name} {self.person.last_name} ({self.type})"
+
 
 class Sponsor(models.Model):
     name = models.CharField(max_length=200)
@@ -62,3 +74,32 @@ class Proposal(models.Model):
     fa_cost = models.DecimalField(decimal_places=2, max_digits=10)
 
     fiscal_year = models.IntegerField()
+
+    def __str__(self):
+        return f"Proposal {self.wd_id or self.ps_id}"
+
+
+class Award(models.Model):
+    wd_id = models.CharField(max_length=50, null=True)
+    ps_id = models.CharField(max_length=50, null=True)
+
+    proposal = models.ForeignKey(Proposal, null=True, on_delete=models.SET_NULL)
+
+    title = models.CharField(max_length=200)
+
+    investigators = models.ManyToManyField(through=Collaborator, to=Person)
+
+    sponsor = models.ForeignKey(Sponsor, on_delete=models.SET_NULL, null=True)
+    prime_sponsor = models.ForeignKey(
+        Sponsor, on_delete=models.SET_NULL, null=True, related_name="prime_awards"
+    )
+
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+
+    beginning_fiscal_year = models.IntegerField()
+
+    type = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f"Award {self.wd_id or self.ps_id}"

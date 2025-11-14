@@ -13,6 +13,12 @@ class PersonAdmin(admin.ModelAdmin):
         "department",
     )
     list_filter = ("department",)
+    search_fields = (
+        "first_name",
+        "last_name",
+        "other_names",
+        "employee_id",
+    )
 
 
 admin.site.register(Person, PersonAdmin)
